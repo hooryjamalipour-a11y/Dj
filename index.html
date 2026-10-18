@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DJ Reza | استودیو دی‌جی هوشمند و اتومیکس</title>
+  <!-- بارگذاری Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- فونت وزیرمتن -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background-color: #07090e;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    input[type="range"] {
+      accent-color: #06b6d4;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- نوار بالایی -->
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 font-black text-lg text-white">
+          DJ
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-black tracking-tight bg-gradient-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-transparent">
+              DJ REZA | AUTO-MIX STUDIO
+            </h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              Smart Bass-Swap 2.0
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">
+            ریمیکس هوشمند پیوسته • تعویض نرم بیس بدون افت ضرب • پخش خودکار اینترو در بخش بی‌کلام
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <button id="btnAutoMixToggle" onclick="toggleAutoMixMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition-all bg-emerald-500/15 text-emerald-300 border-emerald-500/30">
+          ⚡ اتومیکس هوشمند: روشن
+        </button>
+
+        <button id="btnBassSwapToggle" onclick="toggleBassSwapMode()" class="px-3.5 py-2 rounded-xl text-xs font-bold border transition-all bg-cyan-500/15 text-cyan-300 border-cyan-500/30">
+          🔊 تعویض نرم بیس (Bass-Swap): فعال
+        </button>
+
+        <button id="btnTriggerTransition" onclick="startSmartTransition()" class="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white shadow-lg shadow-cyan-500/20 hover:opacity-95 transition-all">
+          ⏭️ میکس نرم به آهنگ بعدی (الان)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- محتوای اصلی -->
+  <main class="max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+    
+    <!-- ستون چپ و وسط: دک‌ها، میکسر و رادار اینترو (8 ستون) -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+      
+      <!-- وضعیت لحظه‌ای اتومیکس و بیس -->
+      <div id="statusBanner" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span id="statusDot" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div>
+            <div id="statusTitle" class="text-xs font-bold text-slate-200">آماده پخش و ریمیکس هوشمند</div>
+            <div id="statusSub" class="text-[11px] text-slate-400">آهنگ‌های خود را آپلود کنید یا از لیست پیش‌فرض برای تست استفاده کنید</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <div class="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl">
+            <span class="text-slate-400">مدت زمان ترنزیشن: </span>
+            <select id="transitionSeconds" class="bg-transparent text-cyan-400 font-bold focus:outline-none">
+              <option value="6" class="bg-slate-900">۶ ثانیه</option>
+              <option value="10" selected class="bg-slate-900">۱۰ ثانیه (استاندارد کلاب)</option>
+              <option value="14" class="bg-slate-900">۱۴ ثانیه (فوق نرم)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- دک A و دک B و میکسر میانی -->
+      <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-stretch">
+        
+        <!-- DECK A -->
+        <div class="md:col-span-4 bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-4 flex flex-col justify-between shadow-lg shadow-cyan-950/20">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">DECK A</span>
+              <span id="deckABpm" class="text-xs font-mono text-cyan-400 font-bold">124 BPM • 8A</span>
+            </div>
+            <h2 id="deckATitle" class="font-bold text-sm text-white truncate">در انتظار انتخاب آهنگ...</h2>
+            <p id="deckAArtist" class="text-xs text-slate-400 truncate mb-3">آپلود فایل یا انتخاب از لیست</p>
+
+            <!-- نوار زمان دک A -->
+            <div class="mb-3">
+              <input id="deckASeek" type="range" min="0" max="100" value="0" step="0.1" oninput="seekDeck('A', this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+                <span id="deckACurrent">00:00</span>
+                <span id="deckADuration">00:00</span>
+              </div>
+            </div>
+
+            <!-- اکولایزر و ایزولاتور ۳ بانده دک A -->
+            <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-2.5 mb-3">
+              <div class="text-[11px] text-slate-400 mb-2 flex justify-between">
+                <span>تفکیک فرکانس و بیس (EQ / Stems)</span>
+                <span id="deckABassBadge" class="text-cyan-400 font-bold">بیس: ۱۰۰٪</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">BASS (بیس)</div>
+                  <input id="eqLowA" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('A', 'low', this.value)" class="w-full" />
+                </div>
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">VOCAL (وکال)</div>
+                  <input id="eqMidA" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('A', 'mid', this.value)" class="w-full" />
+                </div>
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">HIGH (ملودی)</div>
+                  <input id="eqHighA" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('A', 'high', this.value)" class="w-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnPlayA" onclick="togglePlayDeck('A')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all">
+              ▶ پخش Deck A
+            </button>
+            <label class="px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer border border-slate-700">
+              📂 فایل
+              <input type="file" accept="audio/*" class="hidden" onchange="loadDirectToDeck('A', this.files[0])" />
+            </label>
+          </div>
+        </div>
+
+        <!-- میکسر مرکزی و کراس‌فیدر هوشمند -->
+        <div class="md:col-span-3 bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between items-center">
+          <div class="w-full text-center">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">میکسر هوشمند بیس</span>
+            <canvas id="visualizerCanvas" width="220" height="90" class="w-full h-24 bg-slate-900 rounded-xl border border-slate-800 mt-2"></canvas>
+          </div>
+
+          <!-- نمایشگر وکال برای تشخیص سکوت خواننده -->
+          <div class="w-full bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 my-2">
+            <div class="flex justify-between items-center text-[11px] mb-1">
+              <span class="text-slate-400">رادار صدای خواننده:</span>
+              <span id="vocalStatusBadge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">بی‌کلام (مناسب اینترو)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+              <div id="vocalMeterBar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-100" style="width: 8%;"></div>
+            </div>
+          </div>
+
+          <!-- کراس‌فیدر -->
+          <div class="w-full">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span class="text-cyan-400">DECK A</span>
+              <span id="crossfadeLabel" class="text-slate-400">کراس‌فیدر</span>
+              <span class="text-fuchsia-400">DECK B</span>
+            </div>
+            <input id="crossfaderInput" type="range" min="0" max="1" step="0.01" value="0" oninput="manualCrossfade(this.value)" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer" />
+          </div>
+        </div>
+
+        <!-- DECK B -->
+        <div class="md:col-span-4 bg-slate-900/90 border border-fuchsia-500/30 rounded-2xl p-4 flex flex-col justify-between shadow-lg shadow-fuchsia-950/20">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30">DECK B</span>
+              <span id="deckBBpm" class="text-xs font-mono text-fuchsia-400 font-bold">126 BPM • 8A</span>
+            </div>
+            <h2 id="deckBTitle" class="font-bold text-sm text-white truncate">در انتظار آهنگ بعدی...</h2>
+            <p id="deckBArtist" class="text-xs text-slate-400 truncate mb-3">آماده برای میکس خودکار</p>
+
+            <!-- نوار زمان دک B -->
+            <div class="mb-3">
+              <input id="deckBSeek" type="range" min="0" max="100" value="0" step="0.1" oninput="seekDeck('B', this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+                <span id="deckBCurrent">00:00</span>
+                <span id="deckBDuration">00:00</span>
+              </div>
+            </div>
+
+            <!-- اکولایزر و ایزولاتور ۳ بانده دک B -->
+            <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-2.5 mb-3">
+              <div class="text-[11px] text-slate-400 mb-2 flex justify-between">
+                <span>تفکیک فرکانس و بیس (EQ / Stems)</span>
+                <span id="deckBBassBadge" class="text-fuchsia-400 font-bold">بیس: ۱۰۰٪</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">BASS (بیس)</div>
+                  <input id="eqLowB" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('B', 'low', this.value)" class="w-full" />
+                </div>
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">VOCAL (وکال)</div>
+                  <input id="eqMidB" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('B', 'mid', this.value)" class="w-full" />
+                </div>
+                <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                  <div class="text-[10px] text-slate-400 mb-1">HIGH (ملودی)</div>
+                  <input id="eqHighB" type="range" min="-24" max="6" value="0" step="0.5" oninput="setDeckEQ('B', 'high', this.value)" class="w-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnPlayB" onclick="togglePlayDeck('B')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-fuchsia-500 hover:bg-fuchsia-400 text-slate-950 transition-all">
+              ▶ پخش Deck B
+            </button>
+            <label class="px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer border border-slate-700">
+              📂 فایل
+              <input type="file" accept="audio/*" class="hidden" onchange="loadDirectToDeck('B', this.files[0])" />
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- بخش ضبط صدای اینترو و زمان‌بندی هوشمند ۵ دقیقه‌ای -->
+      <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-sm font-black text-amber-300 flex items-center gap-2">
+              🎙️ استودیو ضبط اینترو (Voice Drop) + پخش هوشمند هر ۵ دقیقه در بخش بی‌کلام
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">
+              سیستم هر ۵ دقیقه رادار وکال را بررسی می‌کند و به محض اینکه خواننده نخواند، صدای میانی آهنگ را کمی پایین آورده (بدون افت بیس) و صدای شما را پخش می‌کند.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <select id="introIntervalSelect" onchange="updateIntroInterval(this.value)" class="bg-slate-950 border border-slate-800 text-amber-300 text-xs font-bold rounded-xl px-3 py-2">
+              <option value="300">هر ۵ دقیقه (۳۰۰ ثانیه)</option>
+              <option value="180">هر ۳ دقیقه (۱۸۰ ثانیه)</option>
+              <option value="30">هر ۳۰ ثانیه (حالت تست سریع)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-slate-950/90 border border-slate-800 rounded-xl p-3">
+          <div class="md:col-span-5 flex flex-wrap items-center gap-2">
+            <button id="btnRecordMic" onclick="toggleMicRecording()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-all">
+              🔴 ضبط با میکروفون
+            </button>
+            <label class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer border border-slate-700">
+              ⬆️ آپلود فایل اینترو
+              <input type="file" accept="audio/*" class="hidden" onchange="uploadIntroVoice(this.files[0])" />
+            </label>
+          </div>
+
+          <div class="md:col-span-4 text-xs">
+            <div class="text-slate-400">وضعیت اینترو: <span id="introFileName" class="text-amber-300 font-bold">تگ صوتی پیش‌فرض استودیو فعال است</span></div>
+            <div class="text-slate-400 mt-1">شمارش معکوس تا پخش بعدی: <span id="introCountdown" class="font-mono text-cyan-400 font-bold">05:00</span></div>
+          </div>
+
+          <div class="md:col-span-3 flex justify-end">
+            <button onclick="playIntroVoiceDrop(true)" class="w-full md:w-auto px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all">
+              🔊 تست پخش فوری اینترو روی موزیک
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ستون راست: لیست آهنگ‌ها، افزودن اسم آهنگ و آپلود گروهی (4 ستون) -->
+    <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-black text-white">🎵 لیست پخش و صف ریمیکس</h3>
+          <button onclick="sortPlaylistHarmonic()" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 hover:bg-fuchsia-500/25">
+            ✨ چیدمان بهترین اتصال بیس و گام
+          </button>
+        </div>
+
+        <!-- آپلود چندتایی فایل‌های صوتی -->
+        <label class="w-full mb-3 p-3 border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-xl bg-cyan-500/5 flex flex-col items-center justify-center cursor-pointer transition-all text-center">
+          <span class="text-xs font-bold text-cyan-300">📂 آپلود چند آهنگ از کامپیوتر یا موبایل</span>
+          <span class="text-[11px] text-slate-400 mt-0.5">فرمت‌های MP3, WAV, M4A, OGG پشتیبانی می‌شوند</span>
+          <input type="file" accept="audio/*" multiple class="hidden" onchange="handleMultipleFilesUpload(this.files)" />
+        </label>
+
+        <!-- افزودن با نوشتن نام آهنگ -->
+        <div class="flex gap-2 mb-3">
+          <input id="songNameInput" type="text" placeholder="یا اسم آهنگ را بنویسید (مثلا: شاد ایرانی ۱)..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" />
+          <button onclick="addSongByName()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950">
+            + افزودن
+          </button>
+        </div>
+
+        <!-- لیست آهنگ‌ها -->
+        <div id="playlistContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+        💡 <b>نکته حرفه‌ای:</b> در هنگام تعویض آهنگ، بیسِ آهنگ جدید ابتدا بسته است تا تداخل بیس (Muddy Bass) ایجاد نشود و در میانه میکس، بیس آهنگ قبلی به نرمی جای خود را به بیس آهنگ جدید می‌دهد.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- المان‌های صوتی مخفی برای دک A و دک B و اینترو -->
+  <audio id="audioA" crossorigin="anonymous"></audio>
+  <audio id="audioB" crossorigin="anonymous"></audio>
+  <audio id="audioIntro" crossorigin="anonymous"></audio>
+
+  <script>
+    // ================== موتور صوتی Web Audio API ==================
+    let audioCtx = null;
+    let deckNodes = { A: null, B: null };
+    let masterAnalyser = null;
+    let isAudioGraphReady = false;
+
+    let autoMixEnabled = true;
+    let smartBassSwapEnabled = true;
+    let isTransitioning = false;
+    let activeDeck = 'A';
+
+    // وضعیت اینترو هر ۵ دقیقه
+    let introIntervalSec = 300;
+    let introRemainingSec = 300;
+    let waitingForVocalGap = false;
+    let customIntroBlobUrl = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecordingMic = false;
+
+    // ساخت نمونه صوتی سنتز شده با بیس واقعی (WAV درون‌خطی) برای زمانی که کاربر فقط اسم آهنگ را وارد می‌کند یا تست می‌کند
+    function generateBeatWavUrl(bpm = 124, freqBase = 55) {
+      const sampleRate = 22050;
+      const durationSeconds = 32;
+      const numSamples = sampleRate * durationSeconds;
+      const buffer = new ArrayBuffer(44 + numSamples * 2);
+      const view = new DataView(buffer);
+
+      const writeStr = (offset, str) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      };
+      writeStr(0, 'RIFF');
+      view.setUint32(4, 36 + numSamples * 2, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, 'data');
+      view.setUint32(40, numSamples * 2, true);
+
+      const beatPeriod = 60 / bpm;
+      for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate;
+        const beatPos = (t % beatPeriod) / beatPeriod;
+        // Kick & Sub-bass
+        const kickEnv = Math.exp(-beatPos * 9);
+        const kickFreq = freqBase + 90 * Math.exp(-beatPos * 25);
+        const kick = Math.sin(2 * Math.PI * kickFreq * t) * kickEnv * 0.75;
+
+        // Melodic Pad (در برخی ثانیه‌ها وکال/ملودی قطع می‌شود تا بخش بی‌کلام شبیه‌سازی شود)
+        const phrasePos = t % 16;
+        const hasVocalSim = phrasePos > 4 && phrasePos < 11;
+        const vocalSim = hasVocalSim ? Math.sin(2 * Math.PI * (freqBase * 8) * t) * 0.18 * Math.sin(t * 4) : 0;
+
+        // Hi-hat
+        const hatEnv = Math.exp(-((beatPos * 2) % 1) * 30);
+        const hat = (Math.random() * 2 - 1) * hatEnv * 0.08;
+
+        const sample = Math.max(-1, Math.min(1, kick + vocalSim + hat));
+        view.setInt16(44 + i * 2, sample * 32767, true);
+      }
+      const blob = new Blob([buffer], { type: 'audio/wav' });
+      return URL.createObjectURL(blob);
+    }
+
+    // لیست پخش اولیه
+    let playlist = [
+      { id: 1, title: 'Deep Club Groove (دموی بیس عمیق ۱)', artist: 'DJ Reza Studio', bpm: 124, key: '8A', url: generateBeatWavUrl(124, 55) },
+      { id: 2, title: 'Midnight Persian House (دموی بیس ۲)', artist: 'DJ Reza Studio', bpm: 126, key: '8A', url: generateBeatWavUrl(126, 62) },
+      { id: 3, title: 'Sunset Progressive Mix (دموی بیس ۳)', artist: 'DJ Reza Studio', bpm: 128, key: '9A', url: generateBeatWavUrl(128, 49) }
+    ];
+
+    function initAudioEngine() {
+      if (isAudioGraphReady) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return;
+      }
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContextClass();
+
+      masterAnalyser = audioCtx.createAnalyser();
+      masterAnalyser.fftSize = 256;
+      masterAnalyser.connect(audioCtx.destination);
+
+      ['A', 'B'].forEach(deck => {
+        const audioEl = document.getElementById('audio' + deck);
+        const source = audioCtx.createMediaElementSource(audioEl);
+
+        const low = audioCtx.createBiquadFilter();
+        low.type = 'lowshelf';
+        low.frequency.value = 220;
+
+        const mid = audioCtx.createBiquadFilter();
+        mid.type = 'peaking';
+        mid.frequency.value = 1100;
+        mid.Q.value = 1.0;
+
+        const high = audioCtx.createBiquadFilter();
+        high.type = 'highshelf';
+        high.frequency.value = 3600;
+
+        const crossGain = audioCtx.createGain();
+        crossGain.gain.value = deck === 'A' ? 1 : 0;
+
+        source.connect(low);
+        low.connect(mid);
+        mid.connect(high);
+        high.connect(crossGain);
+        crossGain.connect(masterAnalyser);
+
+        deckNodes[deck] = { audioEl, low, mid, high, crossGain };
+      });
+
+      isAudioGraphReady = true;
+      requestAnimationFrame(updateVisualizerAndVocalRadar);
+    }
+
+    // بارگذاری آهنگ روی دک
+    function loadTrackToDeck(deck, track) {
+      const audioEl = document.getElementById('audio' + deck);
+      audioEl.src = track.url;
+      document.getElementById(`deck${deck}Title`).textContent = track.title;
+      document.getElementById(`deck${deck}Artist`).textContent = track.artist;
+      document.getElementById(`deck${deck}Bpm`).textContent = `${track.bpm} BPM • ${track.key}`;
+    }
+
+    function loadDirectToDeck(deck, file) {
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const track = {
+        id: Date.now(),
+        title: file.name.replace(/\.[^/.]+\$/, ''),
+        artist: 'فایل آپلود شده',
+        bpm: 125,
+        key: '8A',
+        url
+      };
+      playlist.push(track);
+      renderPlaylist();
+      loadTrackToDeck(deck, track);
+    }
+
+    function togglePlayDeck(deck) {
+      initAudioEngine();
+      const audioEl = document.getElementById('audio' + deck);
+      const btn = document.getElementById('btnPlay' + deck);
+      if (audioEl.paused) {
+        audioEl.play();
+        btn.textContent = `⏸ توقف Deck ${deck}`;
+        activeDeck = deck;
+      } else {
+        audioEl.pause();
+        btn.textContent = `▶ پخش Deck ${deck}`;
+      }
+    }
+
+    function seekDeck(deck, percent) {
+      const audioEl = document.getElementById('audio' + deck);
+      if (audioEl.duration) {
+        audioEl.currentTime = (percent / 100) * audioEl.duration;
+      }
+    }
+
+    function setDeckEQ(deck, band, dbValue) {
+      initAudioEngine();
+      const val = parseFloat(dbValue);
+      if (deckNodes[deck] && deckNodes[deck][band]) {
+        deckNodes[deck][band].gain.setTargetAtTime(val, audioCtx.currentTime, 0.04);
+      }
+      if (band === 'low') {
+        const pct = Math.max(0, Math.round(((val + 24) / 30) * 100));
+        document.getElementById(`deck${deck}BassBadge`).textContent = `بیس: ${pct}٪`;
+      }
+    }
+
+    // کراس‌فیدر دستی با حفظ قدرت صدای مساوی (Equal-Power)
+    function manualCrossfade(val) {
+      initAudioEngine();
+      const x = parseFloat(val);
+      const gainA = Math.cos(x * 0.5 * Math.PI);
+      const gainB = Math.cos((1.0 - x) * 0.5 * Math.PI);
+      deckNodes.A.crossGain.gain.setTargetAtTime(gainA, audioCtx.currentTime, 0.03);
+      deckNodes.B.crossGain.gain.setTargetAtTime(gainB, audioCtx.currentTime, 0.03);
+    }
+
+    // ================== الگوریتم میکس نرم و تعویض هوشمند بیس (Bass-Swap) ==================
+    function startSmartTransition() {
+      if (isTransitioning) return;
+      initAudioEngine();
+
+      const fromDeck = activeDeck;
+      const toDeck = fromDeck === 'A' ? 'B' : 'A';
+      const audioFrom = document.getElementById('audio' + fromDeck);
+      const audioTo = document.getElementById('audio' + toDeck);
+
+      // شروع پخش دک بعدی
+      if (audioTo.paused) {
+        audioTo.currentTime = 0;
+        audioTo.play();
+        document.getElementById('btnPlay' + toDeck).textContent = `⏸ توقف Deck ${toDeck}`;
+      }
+
+      isTransitioning = true;
+      const durationSec = parseInt(document.getElementById('transitionSeconds').value, 10) || 10;
+      const steps = durationSec * 20;
+      let currentStep = 0;
+
+      // در ابتدای میکس، بیس آهنگ جدید کاملاً بسته می‌شود تا دو بیس روی هم نیفتند
+      if (smartBassSwapEnabled) {
+        setDeckEQ(toDeck, 'low', -22);
+        document.getElementById('eqLow' + toDeck).value = -22;
+      }
+
+      document.getElementById('statusTitle').textContent = `در حال میکس نرم از Deck ${fromDeck} به Deck ${toDeck}...`;
+      document.getElementById('statusSub').textContent = smartBassSwapEnabled
+        ? 'تعویض هوشمند بیس (Smart Bass-Swap) فعال است تا ضرب‌آهنگ قطع نشود'
+        : 'کراس‌فید استاندارد در حال انجام است';
+
+      const interval = setInterval(() => {
+        currentStep++;
+        const progress = currentStep / steps; // 0 تا 1
+        const cfValue = fromDeck === 'A' ? progress : 1 - progress;
+        document.getElementById('crossfaderInput').value = cfValue;
+        manualCrossfade(cfValue);
+
+        // نقطه طلایی تعویض بیس (بین ۳۵٪ تا ۶۵٪ مسیر ترنزیشن)
+        if (smartBassSwapEnabled) {
+          if (progress < 0.45) {
+            // بیس آهنگ اول کامل حفظ می‌شود، ملودی آهنگ دوم نرم وارد می‌شود
+            setDeckEQ(fromDeck, 'low', 0);
+            setDeckEQ(toDeck, 'low', -22 + progress * 20);
+          } else {
+            // تعویض نرم بیس به آهنگ جدید
+            const swapProg = (progress - 0.45) / 0.55;
+            const fromBass = -22 * swapProg;
+            const toBass = -12 * (1 - swapProg);
+            setDeckEQ(fromDeck, 'low', fromBass);
+            setDeckEQ(toDeck, 'low', toBass);
+            document.getElementById('eqLow' + fromDeck).value = fromBass;
+            document.getElementById('eqLow' + toDeck).value = toBass;
+          }
+        }
+
+        if (currentStep >= steps) {
+          clearInterval(interval);
+          audioFrom.pause();
+          document.getElementById('btnPlay' + fromDeck).textContent = `▶ پخش Deck ${fromDeck}`;
+          setDeckEQ(fromDeck, 'low', 0);
+          setDeckEQ(toDeck, 'low', 0);
+          document.getElementById('eqLow' + fromDeck).value = 0;
+          document.getElementById('eqLow' + toDeck).value = 0;
+
+          activeDeck = toDeck;
+          isTransitioning = false;
+          document.getElementById('statusTitle').textContent = `در حال پخش روی Deck ${toDeck}`;
+          document.getElementById('statusSub').textContent = 'آهنگ بعدی در دک مقابل آماده میکس خودکار است';
+
+          // بارگذاری خودکار آهنگ بعدی از پلی‌لیست در دک آزاد شده
+          cueNextTrackInFreeDeck(fromDeck);
+        }
+      }, 50);
+    }
+
+    let playlistPointer = 1;
+    function cueNextTrackInFreeDeck(freeDeck) {
+      if (playlist.length === 0) return;
+      playlistPointer = (playlistPointer + 1) % playlist.length;
+      loadTrackToDeck(freeDeck, playlist[playlistPointer]);
+    }
+
+    // ================== رادار تشخیص صدای خواننده و پخش اینترو هر ۵ دقیقه ==================
+    let currentVocalEnergy = 0;
+
+    function updateVisualizerAndVocalRadar() {
+      if (!masterAnalyser) return;
+      const canvas = document.getElementById('visualizerCanvas');
+      const ctx = canvas.getContext('2d');
+      const data = new Uint8Array(masterAnalyser.frequencyBinCount);
+      masterAnalyser.getByteFrequencyData(data);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const barWidth = (canvas.width / 32) - 2;
+
+      // محاسبه انرژی بازه فرکانسی صدای خواننده (حدود 400Hz تا 2800Hz)
+      let vocalSum = 0;
+      for (let i = 3; i <= 18; i++) {
+        vocalSum += data[i];
+      }
+      currentVocalEnergy = Math.round((vocalSum / (16 * 255)) * 100);
+
+      // بروزرسانی نوار رادار وکال
+      const meter = document.getElementById('vocalMeterBar');
+      const badge = document.getElementById('vocalStatusBadge');
+      meter.style.width = `${Math.min(100, currentVocalEnergy)}%`;
+
+      const isInstrumentalMoment = currentVocalEnergy < 38;
+      if (isInstrumentalMoment) {
+        badge.textContent = 'بی‌کلام (مناسب اینترو)';
+        badge.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold';
+        // اگر تایمر ۵ دقیقه تمام شده و منتظر سکوت خواننده بودیم، همین الان پخش کن!
+        if (waitingForVocalGap) {
+          waitingForVocalGap = false;
+          playIntroVoiceDrop(false);
+        }
+      } else {
+        badge.textContent = 'خواننده در حال خواندن';
+        badge.className = 'px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold';
+      }
+
+      // رسم اکولایزر گرافیکی
+      for (let i = 0; i < 32; i++) {
+        const val = data[i];
+        const h = (val / 255) * canvas.height;
+        ctx.fillStyle = i < 6 ? '#06b6d4' : i < 18 ? '#d946ef' : '#fbbf24';
+        ctx.fillRect(i * (barWidth + 2), canvas.height - h, barWidth, h);
+      }
+
+      requestAnimationFrame(updateVisualizerAndVocalRadar);
+    }
+
+    // پخش اینترو با پایین آوردن نرم فرکانس میانی موزیک (بدون قطع شدن بیس)
+    function playIntroVoiceDrop(forceManual) {
+      initAudioEngine();
+      // کاهش موقت صدای میانی (وکال) آهنگ در حال پخش تا صدای اینترو شفاف شنیده شود اما بیس قطع نشود
+      ['A', 'B'].forEach(d => {
+        if (deckNodes[d]) {
+          deckNodes[d].mid.gain.setTargetAtTime(-12, audioCtx.currentTime, 0.15);
+        }
+      });
+
+      document.getElementById('statusTitle').textContent = '🎙️ در حال پخش اینتروی اختصاصی شما روی بیت...';
+
+      if (customIntroBlobUrl) {
+        const introEl = document.getElementById('audioIntro');
+        introEl.src = customIntroBlobUrl;
+        introEl.play();
+        introEl.onended = restoreMusicAfterIntro;
+      } else if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance('DJ Reza Exclusive Mix');
+        utter.rate = 0.95;
+        utter.pitch = 0.9;
+        utter.onend = restoreMusicAfterIntro;
+        window.speechSynthesis.speak(utter);
+        setTimeout(restoreMusicAfterIntro, 3200);
+      } else {
+        setTimeout(restoreMusicAfterIntro, 2500);
+      }
+
+      introRemainingSec = introIntervalSec;
+    }
+
+    function restoreMusicAfterIntro() {
+      ['A', 'B'].forEach(d => {
+        if (deckNodes[d]) {
+          deckNodes[d].mid.gain.setTargetAtTime(0, audioCtx.currentTime, 0.3);
+        }
+      });
+      document.getElementById('statusTitle').textContent = `در حال پخش روی Deck ${activeDeck}`;
+    }
+
+    // ضبط میکروفون برای اینترو
+    async function toggleMicRecording() {
+      const btn = document.getElementById('btnRecordMic');
+      if (!isRecordingMic) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = [];
+          mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          };
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            customIntroBlobUrl = URL.createObjectURL(blob);
+            document.getElementById('introFileName').textContent = '✅ صدای ضبط شده شما آماده پخش است';
+          };
+          mediaRecorder.start();
+          isRecordingMic = true;
+          btn.textContent = '⏹ توقف و ذخیره ضبط';
+          btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 animate-pulse';
+        } catch (err) {
+          alert('دسترسی به میکروفون امکان‌پذیر نبود. می‌توانید فایل صوتی اینترو را آپلود کنید.');
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecordingMic = false;
+        btn.textContent = '🔴 ضبط مجدد با میکروفون';
+        btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-all';
+      }
+    }
+
+    function uploadIntroVoice(file) {
+      if (!file) return;
+      customIntroBlobUrl = URL.createObjectURL(file);
+      document.getElementById('introFileName').textContent = `✅ ${file.name}`;
+    }
+
+    function updateIntroInterval(val) {
+      introIntervalSec = parseInt(val, 10);
+      introRemainingSec = introIntervalSec;
+    }
+
+    // تایمر ۱ ثانیه‌ای برای بررسی زمان آهنگ‌ها و شمارش معکوس ۵ دقیقه‌ای اینترو
+    setInterval(() => {
+      ['A', 'B'].forEach(deck => {
+        const el = document.getElementById('audio' + deck);
+        if (el && el.duration) {
+          const cur = el.currentTime;
+          const dur = el.duration;
+          document.getElementById(`deck${deck}Current`).textContent = formatTime(cur);
+          document.getElementById(`deck${deck}Duration`).textContent = formatTime(dur);
+          document.getElementById(`deck${deck}Seek`).value = (cur / dur) * 100;
+
+          // شروع خودکار میکس در ۱۰ ثانیه پایانی آهنگ فعال
+          const transSec = parseInt(document.getElementById('transitionSeconds').value, 10) || 10;
+          if (autoMixEnabled && activeDeck === deck && !el.paused && !isTransitioning && (dur - cur <= transSec) && dur > 15) {
+            startSmartTransition();
+          }
+        }
+      });
+
+      // شمارشگر ۵ دقیقه‌ای اینترو در صورت روشن بودن حداقل یکی از دک‌ها
+      const isPlayingAny = !document.getElementById('audioA').paused || !document.getElementById('audioB').paused;
+      if (isPlayingAny) {
+        if (introRemainingSec > 0) {
+          introRemainingSec--;
+        } else {
+          waitingForVocalGap = true;
+        }
+      }
+      document.getElementById('introCountdown').textContent = waitingForVocalGap
+        ? 'در انتظار سکوت خواننده...'
+        : formatTime(introRemainingSec);
+    }, 1000);
+
+    function formatTime(sec) {
+      if (!sec || isNaN(sec)) return '00:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // ================== مدیریت لیست پخش و آپلود ==================
+    function renderPlaylist() {
+      const container = document.getElementById('playlistContainer');
+      container.innerHTML = '';
+      playlist.forEach((track, idx) => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-950/90 border border-slate-800 hover:border-slate-700 rounded-xl p-2.5 flex items-center justify-between gap-2 transition-all';
+        div.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold text-white truncate">${idx + 1}. ${track.title}</div>
+            <div class="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
+              <span>${track.artist}</span>
+              <span class="text-cyan-400 font-mono">${track.bpm} BPM</span>
+              <span class="text-fuchsia-400 font-mono">${track.key}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="loadTrackToDeck('A', playlist[${idx}])" class="px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold hover:bg-cyan-500/30">Deck A</button>
+            <button onclick="loadTrackToDeck('B', playlist[${idx}])" class="px-2 py-1 rounded bg-fuchsia-500/20 text-fuchsia-300 text-[10px] font-bold hover:bg-fuchsia-500/30">Deck B</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function handleMultipleFilesUpload(files) {
+      if (!files || !files.length) return;
+      Array.from(files).forEach((file, idx) => {
+        const url = URL.createObjectURL(file);
+        playlist.push({
+          id: Date.now() + idx,
+          title: file.name.replace(/\.[^/.]+\$/, ''),
+          artist: 'فایل آپلود شده',
+          bpm: 122 + ((playlist.length * 2) % 10),
+          key: '8A',
+          url
+        });
+      });
+      renderPlaylist();
+      if (playlist.length >= 2) {
+        loadTrackToDeck('A', playlist[playlist.length - files.length]);
+      }
+    }
+
+    function addSongByName() {
+      const input = document.getElementById('songNameInput');
+      const name = input.value.trim();
+      if (!name) return;
+      const bpm = 122 + ((playlist.length * 2) % 10);
+      playlist.push({
+        id: Date.now(),
+        title: name,
+        artist: 'سنتز هوشمند استودیو',
+        bpm,
+        key: '8A',
+        url: generateBeatWavUrl(bpm, 52 + (playlist.length % 15))
+      });
+      input.value = '';
+      renderPlaylist();
+    }
+
+    function sortPlaylistHarmonic() {
+      playlist.sort((a, b) => a.bpm - b.bpm);
+      renderPlaylist();
+    }
+
+    function toggleAutoMixMode() {
+      autoMixEnabled = !autoMixEnabled;
+      const btn = document.getElementById('btnAutoMixToggle');
+      btn.textContent = autoMixEnabled ? '⚡ اتومیکس هوشمند: روشن' : '⚡ اتومیکس هوشمند: خاموش';
+    }
+
+    function toggleBassSwapMode() {
+      smartBassSwapEnabled = !smartBassSwapEnabled;
+      const btn = document.getElementById('btnBassSwapToggle');
+      btn.textContent = smartBassSwapEnabled ? '🔊 تعویض نرم بیس (Bass-Swap): فعال' : '🔊 تعویض نرم بیس: غیرفعال';
+    }
+
+    // مقداردهی اولیه هنگام باز شدن صفحه
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPlaylist();
+      loadTrackToDeck('A', playlist[0]);
+      loadTrackToDeck('B', playlist[1]);
+    });
+  </script>
+</body>
+</html>
